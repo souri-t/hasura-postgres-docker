@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+  graphql-engine:
+    image: hasura/graphql-engine:v2.0.10
+    ports:
+    - "8080:8080"
+    depends_on:
+    - "postgres"
+    restart: always
+    environment:
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:password@postgres:5432/postgres
+      PG_DATABASE_URL: postgres://postgres:password@postgres:5432/postgres
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+  postgres:
+    image: postgres:13.2-alpine
+    restart: always
+    ports:
+        - 5432:5432
+    volumes:
+    - ./postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      PGPASSWORD: password
+      POSTGRES_DB: OwnDb
+      TZ: "Asia/Tokyo"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 81:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres
